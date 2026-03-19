@@ -3,7 +3,10 @@ from .models import Livro, Emprestimo, Usuario
 from .serializers import LivroSerializer, EmprestimoSerializer, UsuarioSerializer
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
+from django.shortcuts import render
 
+def home(request):
+    return render(request, "dashboard.html")
 
 class LivroViewSet(ModelViewSet):
     queryset = Livro.objects.all().order_by("-id")
