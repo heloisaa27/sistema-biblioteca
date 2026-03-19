@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Novo Empréstimo</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <h2>Sistema Biblioteca</h2>
+    <span class="version">Versão 1.0</span>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a class="active" href="emprestimos.html">Empréstimos</a>
+      <a href="livros.html">Livros</a>
+      <a href="usuarios.html">Usuários</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <h1>Novo Empréstimo</h1>
+
+    <div class="panel">
+      <form id="formEmprestimo">
+
+        <label>Livro</label>
+        <select id="livro" required>
+          <option value="">Selecione um livro</option>
+        </select>
+
+        <label>Usuário</label>
+        <select id="usuario" required>
+          <option value="">Selecione um usuário</option>
+        </select>
+
+        <label>Data do Empréstimo</label>
+        <input type="date" id="dataEmprestimo" required>
+
+        <label>Data de Devolução</label>
+        <input type="date" id="dataDevolucao" required>
+
+        <br><br>
+        <button class="btn">Salvar</button>
+        <button type="button" class="btn-cancelar" onclick="window.location.href='emprestimos.html'">
+        Cancelar</button>
+      </form>
+    </div>
+
+  </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script src="js/emprestimo-form.js"></script>
+</body>
+</html>

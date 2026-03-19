@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema Biblioteca | Usuários</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h2>Sistema Biblioteca</h2>
+    <span class="version">Versão 1.0</span>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="emprestimos.html">Empréstimos</a>
+      <a href="livros.html">Livros</a>
+      <a class="active" href="usuarios.html">Usuários</a>
+    </nav>
+
+      <footer>
+    © 2026 Sistema Biblioteca
+    </footer>
+  </aside>
+
+  <main class="main">
+    <div class="page-header">
+      <div>
+        <h1>Usuários</h1>
+        <p>Gerencie os usuários</p>
+      </div>
+      <a href="usuarios-form.html" class="btn">+ Cadastrar Usuário</a>
+    </div>
+
+    <div class="search-bar">
+      <input
+      type="text"
+      id="buscarUsuario"
+      placeholder="Pesquisar usuário...">
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>E-mail</th>
+          <th>Telefone</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="listaUsuarios"></tbody>
+    </table>
+
+    <div class="paginacao">
+    <button id="prevPage">Anterior</button>
+    <span id="pageInfo"></span>
+    <button id="nextPage">Próximo</button>
+    </div>
+
+  </main>
+</div>
+<script src="js/usuarios.js"></script>
+<script>lucide.createIcons(); </script>
+</body>
+</html>

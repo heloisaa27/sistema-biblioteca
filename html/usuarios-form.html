@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Novo Usuário</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <h2>Sistema Biblioteca</h2>
+    <span class="version">Versão 1.0</span>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="emprestimos.html">Empréstimos</a>
+      <a href="livros.html">Livros</a>
+      <a class="active" href="usuarios.html">Usuários</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <h1>Novo Usuário</h1>
+
+    <div class="panel">
+      <form id="usuarioForm">
+        <label>Nome</label>
+        <input type="text" id="nome" required>
+
+        <label>E-mail</label>
+        <input type="text" id="email" required>
+
+        <label>Telefone</label>
+        <input type="text" id="telefone" required>
+
+        <br><br>
+        <button class="btn">Salvar</button>
+        <button type="button" class="btn-cancelar" onclick="window.location.href='usuarios.html'">
+        Cancelar </button>
+      </form>
+    </div>
+
+  </main>
+
+</div>
+
+<script src="js/usuario-form.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Sistema Biblioteca | Dashboard</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+
+<div class="layout">
+
+<aside class="sidebar">
+
+<h2>Sistema Biblioteca</h2>
+<span class="version">Versão 1.0</span>
+
+<nav>
+<a class="active" href="dashboard.html">Dashboard</a>
+<a href="emprestimos.html">Empréstimos</a>
+<a href="livros.html">Livros</a>
+<a href="usuarios.html">Usuários</a>
+</nav>
+
+<footer>
+© 2026 Sistema Biblioteca
+</footer>
+
+</aside>
+
+
+<main class="main">
+
+<div class="page-header">
+<div>
+<h1>Dashboard Administrativo</h1>
+<p>Visão geral do sistema</p>
+</div>
+</div>
+
+
+<!-- CARDS -->
+
+<section class="cards">
+
+<div class="card">
+<h3>Empréstimos Ativos</h3>
+<strong id="cardAtivos">0</strong>
+</div>
+
+<div class="card warning">
+<h3>Empréstimos Atrasados</h3>
+<strong id="cardAtrasados">0</strong>
+</div>
+
+<div class="card success">
+<h3>Livros Disponíveis</h3>
+<strong id="cardDisponiveis">0</strong>
+</div>
+
+<div class="card">
+<h3>Total de Livros</h3>
+<strong id="cardTotalLivros">0</strong>
+</div>
+</section>
+
+
+
+<section class="dashboard-charts">
+
+<div class="panel chart-large">
+
+<div class="filtros-grafico">
+<button class="botao_filtro" id="btnSemana">
+Última semana
+</button>
+
+<button class="botao_filtro" id="btnMes">
+Último mês
+</button>
+
+<button class="botao_filtro" id="btnTudo">
+Todo período
+</button>
+</div>
+
+<h2>Empréstimos ao Longo do Tempo</h2>
+<canvas id="lineChart"></canvas>
+</div>
+
+<div class="panel">
+<h2>Livros Mais Emprestados</h2>
+<canvas id="barChart"></canvas>
+</div>
+
+<div class="panel">
+<h2>Distribuição de Empréstimos por Status</h2>
+<canvas id="pieChart"></canvas>
+</div>
+
+</section>
+
+<section class="panel">
+
+<h2>Empréstimos Atrasados Recentes</h2>
+
+<table class="table">
+
+<thead>
+<tr>
+<th>Usuário</th>
+<th>Livro</th>
+<th>Data Prevista</th>
+<th>Dias de Atraso</th>
+<th>Multa (R$)</th>
+</tr>
+</thead>
+
+<tbody id="tabelaAtrasados"></tbody>
+
+</table>
+
+</section>
+
+</main>
+
+</div>
+
+<script src="js/charts.js"></script>
+
+</body>
+</html>

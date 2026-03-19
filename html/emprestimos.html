@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema Biblioteca | Empréstimos</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h2>Sistema Biblioteca</h2>
+    <span class="version">Versão 1.0</span>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a class="active" href="emprestimos.html">Empréstimos</a>
+      <a href="livros.html">Livros</a>
+      <a href="usuarios.html">Usuários</a>
+    </nav>
+
+    <footer>
+    © 2026 Sistema Biblioteca
+    </footer>
+  </aside>
+
+  <main class="main">
+
+    <div class="page-header">
+      <div>
+        <h1>Empréstimos</h1>
+        <p>Gerencie os emprestimos</p>
+      </div>
+      <a href="emprestimo-form.html" class="btn">+ Novo Empréstimo</a>
+    </div>
+
+    <div class="search-bar">
+      <input
+      type="text"
+      id="buscarEmprestimo"
+      placeholder="Pesquisar por usuário ou livro...">
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Usuário</th>
+          <th>Livro</th>
+          <th>Data Empréstimo</th>
+          <th>Data Devolução</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+        
+      </thead>
+      <tbody id="listaEmprestimos"></tbody>
+
+    </table>
+
+    <div class="paginacao">
+    <button id="prevPage">Anterior</button>
+    <span id="pageInfo"></span>
+    <button id="nextPage">Próximo</button>
+    </div>
+
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="js/emprestimos.js"></script>
+<script>lucide.createIcons();</script>
+
+</body>
+</html>

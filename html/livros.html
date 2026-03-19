@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema Biblioteca | Livros</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h2>Sistema Biblioteca</h2>
+    <span class="version">Versão 1.0</span>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="emprestimos.html">Empréstimos</a>
+      <a class="active" href="livros.html">Livros</a>
+      <a href="usuarios.html">Usuários</a>
+    </nav>
+
+      <footer>
+    © 2026 Sistema Biblioteca
+    </footer>
+  </aside>
+
+  <main class="main">
+    <div class="page-header">
+      <div>
+        <h1>Livros</h1>
+        <p>Gerencie o acervo</p>
+      </div>
+      <a href="livro-form.html" class="btn">+ Adicionar Livro</a>
+    </div>
+
+    <div class="search-bar">
+      <input
+      type="text"
+      id="buscarLivro"
+      placeholder="Pesquisar por título ou autor...">
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Autor</th>
+          <th>Categoria</th>
+          <th>ISBN</th>
+          <th>Disponíveis</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="listaLivros"></tbody>
+    </table>
+
+    <div class="paginacao">
+    <button id="prevPage">Anterior</button>
+    <span id="pageInfo"></span>
+    <button id="nextPage">Próximo</button>
+    </div>
+
+
+  </main>
+</div>
+<script src="js/livros.js"></script>
+<script>lucide.createIcons(); </script>
+
+</body>
+</html>
