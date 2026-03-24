@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-zzuf5%m@2pbk1v_2fjthlud*+5gg8g%*dhv3@fdl^i^6g%)^h9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["sistema-biblioteca.onrender.com"]
+ALLOWED_HOSTS = ["heloisa.pythonanywhere.com"]
 
 
 # Application definition
@@ -54,14 +54,16 @@ MIDDLEWARE = [
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'biblioteca.urls'
+import os
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
