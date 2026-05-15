@@ -11,12 +11,17 @@ class LivroSerializer(serializers.ModelSerializer):
 
 
 class EmprestimoSerializer(serializers.ModelSerializer):
-    
-    usuario_nome = serializers.CharField(source="usuario.nome", read_only=True)
+    usuario_nome = serializers.SerializerMethodField()
 
     class Meta:
         model = Emprestimo
         fields = '__all__'
+
+    def get_usuario_nome(self, obj):
+        if obj.usuario:
+            return obj.usuario.nome
+
+        return "Usuário removido"
 
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:

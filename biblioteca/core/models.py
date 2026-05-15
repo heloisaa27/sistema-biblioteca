@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.exceptions import ValidationError
 
 
 class Livro(models.Model):
@@ -24,6 +23,7 @@ class Usuario(models.Model):
     telefone = models.CharField(max_length=20)
 
     ativo = models.BooleanField(default=True)
+    desativado_em = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.nome
@@ -63,36 +63,9 @@ class Emprestimo(models.Model):
 
     def save(self, *args, **kwargs):
 
-        # guardar título para histórico
-        if self.livro:
-            self.titulo_livro = self.livro.titulo
+        from .services.emprestimos import preparar_emprestimo_para_salvar
 
-        # criação do empréstimo
-        if not self.pk:
-
-            if not self.livro:
-                raise ValidationError("Livro inválido.")
-
-            if not self.livro.ativo:
-                raise ValidationError("Este livro está desativado.")
-
-            if self.livro.disponiveis <= 0:
-                raise ValidationError("Não há exemplares disponíveis.")
-
-            self.livro.disponiveis -= 1
-            self.livro.save()
-
-        else:
-
-            emprestimo_antigo = Emprestimo.objects.get(pk=self.pk)
-
-            if (
-                emprestimo_antigo.status != "devolvido"
-                and self.status == "devolvido"
-                and self.livro
-            ):
-                self.livro.disponiveis += 1
-                self.livro.save()
+        preparar_emprestimo_para_salvar(self)
 
         super().save(*args, **kwargs)
 

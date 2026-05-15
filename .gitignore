@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django/local database
+*.sqlite3
+db.sqlite3
+biblioteca/db.sqlite3
+
+# Local environment
+.env
+.venv/
+venv/
+env/
+
+# Tooling/cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/

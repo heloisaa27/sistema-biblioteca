@@ -1,0 +1,22 @@
+services:
+  backend:
+    build: ./backend
+    container_name: biblioteca-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - DEBUG=True
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+    command: >
+      sh -c "python manage.py migrate &&
+             gunicorn core.wsgi:application --bind 0.0.0.0:8000"
+
+  frontend:
+    build: ./frontend
+    container_name: biblioteca-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
