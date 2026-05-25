@@ -22,6 +22,7 @@ from core.views import home
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('core.urls')),
+    path('login.html', TemplateView.as_view(template_name='login.html')),
     path('', home),
     path('dashboard.html', home),
     path('emprestimos.html', TemplateView.as_view(template_name='emprestimos.html')),

@@ -22,15 +22,16 @@ O frontend consome a API local configurada em
 
 ```text
 .
+|-- templates/
+|   |-- dashboard.html
+|   |-- emprestimos.html
+|   |-- emprestimo-form.html
+|   |-- livros.html
+|   |-- livro-form.html
+|   |-- login.html
+|   |-- usuarios.html
+|   `-- usuarios-form.html
 |-- frontend/
-|   |-- pages/
-|   |   |-- dashboard.html
-|   |   |-- emprestimos.html
-|   |   |-- emprestimo-form.html
-|   |   |-- livros.html
-|   |   |-- livro-form.html
-|   |   |-- usuarios.html
-|   |   `-- usuarios-form.html
 |   `-- assets/
 |       |-- css/
 |       |   `-- style.css
@@ -47,6 +48,7 @@ O frontend consome a API local configurada em
 |               |-- emprestimo-form.js
 |               |-- livros.js
 |               |-- livro-form.js
+|               |-- login.js
 |               |-- usuarios.js
 |               `-- usuario-form.js
 `-- biblioteca/
@@ -59,8 +61,14 @@ O frontend consome a API local configurada em
     |   `-- wsgi.py
     `-- core/
         |-- models.py
+        |-- permissions.py
         |-- serializers.py
         |-- controllers/
+        |   |-- autenticacao.py
+        |   |-- dashboard.py
+        |   |-- emprestimos.py
+        |   |-- livros.py
+        |   `-- usuarios.py
         |-- repositories/
         |-- services/
         |-- views.py
@@ -74,7 +82,8 @@ O frontend consome a API local configurada em
 
 O projeto agora esta separado em duas areas principais:
 
-- `frontend/`: interface estatica, com paginas HTML e assets proprios.
+- `templates/`: paginas HTML servidas pelo Django.
+- `frontend/assets/`: CSS e JavaScript usados pelos templates.
 - `biblioteca/`: backend Django, API REST e regras de negocio.
 - `biblioteca/config/`: configuracao do projeto Django (`settings`, `urls`,
   `asgi` e `wsgi`).
@@ -91,11 +100,11 @@ No backend, a organizacao segue uma arquitetura em camadas adaptada ao Django:
 
 No frontend, a separacao ficou assim:
 
-- `pages/`: arquivos HTML navegaveis.
-- `assets/js/pages/`: scripts especificos de cada tela.
-- `assets/js/shared/`: utilitarios reutilizaveis, como API, formatacao,
+- `templates/`: arquivos HTML navegaveis servidos pelo Django.
+- `frontend/assets/js/pages/`: scripts especificos de cada tela.
+- `frontend/assets/js/shared/`: utilitarios reutilizaveis, como API, formatacao,
   sanitizacao e tabela paginada.
-- `assets/css/`: estilos da interface.
+- `frontend/assets/css/`: estilos da interface.
 
 ## Dominios principais
 
@@ -193,6 +202,9 @@ Endpoints principais:
 | GET | `/api/emprestimos/{id}/` | Busca emprestimo |
 | PATCH | `/api/emprestimos/{id}/` | Atualiza emprestimo |
 | GET | `/api/dashboard/` | Dados consolidados do dashboard |
+| POST | `/api/auth/login/` | Login administrativo |
+| POST | `/api/auth/logout/` | Logout administrativo |
+| GET | `/api/auth/me/` | Estado da sessao atual |
 
 Filtros do dashboard:
 
@@ -205,11 +217,44 @@ Filtros do dashboard:
 
 Quando `periodo=trimestre`, o dashboard considera os ultimos 90 dias.
 
+### Autenticacao administrativa
+
+As telas administrativas usam sessao padrao do Django. O login aceita apenas
+usuarios Django com `is_staff=True` ou `is_superuser=True`, representando
+administradores ou bibliotecarios.
+
+Endpoints:
+
+- `POST /api/auth/login/`: recebe `username` e `password`, autentica com o
+  sistema padrao do Django e inicia a sessao.
+- `POST /api/auth/logout/`: encerra a sessao atual.
+- `GET /api/auth/me/`: retorna `authenticated`, `is_admin` e `username` quando
+  houver usuario autenticado.
+
+No frontend, `frontend/assets/js/shared/api.js` expoe `window.bibliotecaApi`
+com helpers de autenticacao, CSRF, chamadas HTTP e `requireAdmin()`.
+
+Comportamento da sessao:
+
+- Recarregar a pagina nao faz logout; a sessao Django continua valida enquanto
+  nao expirar.
+- O botao `Sair` chama `/api/auth/logout/` e encerra a sessao imediatamente.
+- `SESSION_COOKIE_AGE` define a duracao maxima da sessao em segundos. O padrao
+  do projeto e `7200` segundos.
+- `SESSION_EXPIRE_AT_BROWSER_CLOSE` controla se a sessao tambem expira ao
+  fechar o navegador. O padrao do projeto e `True`.
+- Essas configuracoes sao lidas de variaveis de ambiente e podem ser copiadas
+  de `.env.example`.
+
 ## Telas do frontend
+
+Todas as telas abaixo exigem autenticacao administrativa no carregamento. Se o
+usuario nao estiver autenticado como admin, o frontend redireciona para
+`login.html` antes de carregar dados da API.
 
 ### Dashboard
 
-Arquivo: `frontend/pages/dashboard.html`
+Arquivo: `templates/dashboard.html`
 
 Script: `frontend/assets/js/pages/dashboard.js`
 
@@ -226,8 +271,8 @@ Funcionalidades:
 
 Arquivos:
 
-- `frontend/pages/livros.html`
-- `frontend/pages/livro-form.html`
+- `templates/livros.html`
+- `templates/livro-form.html`
 - `frontend/assets/js/pages/livros.js`
 - `frontend/assets/js/pages/livro-form.js`
 
@@ -243,8 +288,8 @@ Funcionalidades:
 
 Arquivos:
 
-- `frontend/pages/usuarios.html`
-- `frontend/pages/usuarios-form.html`
+- `templates/usuarios.html`
+- `templates/usuarios-form.html`
 - `frontend/assets/js/pages/usuarios.js`
 - `frontend/assets/js/pages/usuario-form.js`
 
@@ -260,8 +305,8 @@ Funcionalidades:
 
 Arquivos:
 
-- `frontend/pages/emprestimos.html`
-- `frontend/pages/emprestimo-form.html`
+- `templates/emprestimos.html`
+- `templates/emprestimo-form.html`
 - `frontend/assets/js/pages/emprestimos.js`
 - `frontend/assets/js/pages/emprestimo-form.js`
 
@@ -354,10 +399,13 @@ pontos devem ser registrados aqui conforme o sistema evoluir.
 - Grafico de emprestimos ao longo do tempo usa filtros de semana, mes e
   trimestre, evitando o excesso de dados de todo o periodo.
 - `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS` e CORS passam a aceitar variaveis de ambiente.
+- Expiracao da sessao administrativa configuravel por `SESSION_COOKIE_AGE` e
+  `SESSION_EXPIRE_AT_BROWSER_CLOSE`.
 - `.gitignore` criado para banco local, caches Python, ambientes e arquivos locais.
 - Dados inseridos via `innerHTML` agora sao sanitizados com `frontend/assets/js/shared/dom-utils.js`.
 - Banco SQLite local e caches Python removidos do indice do git.
-- Frontend movido para `frontend/`, separando paginas e assets.
+- HTML consolidado em `templates/`, removendo duplicacao com `frontend/pages/`.
+- Assets mantidos em `frontend/assets/`, separando CSS/JS dos templates.
 - Backend reorganizado em `controllers`, `services` e `repositories`.
 - Chamadas HTTP do frontend centralizadas em `frontend/assets/js/shared/api.js`.
 - Pacote Django interno renomeado para `config/`, evitando a estrutura
@@ -374,15 +422,17 @@ A refatoracao foi feita mantendo os comportamentos e endpoints existentes.
 Estrutura adotada:
 
 ```text
+templates/
+|-- dashboard.html
+|-- livros.html
+|-- livro-form.html
+|-- usuarios.html
+|-- usuarios-form.html
+|-- emprestimos.html
+|-- emprestimo-form.html
+`-- login.html
+
 frontend/
-|-- pages/
-|   |-- dashboard.html
-|   |-- livros.html
-|   |-- livro-form.html
-|   |-- usuarios.html
-|   |-- usuarios-form.html
-|   |-- emprestimos.html
-|   `-- emprestimo-form.html
 `-- assets/
     |-- css/
     |   `-- style.css
@@ -400,17 +450,20 @@ frontend/
             |-- usuarios.js
             |-- usuario-form.js
             |-- emprestimos.js
-            `-- emprestimo-form.js
+            |-- emprestimo-form.js
+            `-- login.js
 ```
 
 Responsabilidades:
 
+- `templates/*.html`: paginas HTML oficiais servidas pelas rotas Django.
 - `config.js`: URL base da API e helper `apiUrl`.
-- `api.js`: funcoes `apiGet`, `apiPost`, `apiPut` e `apiPatch`.
+- `api.js`: funcoes `apiGet`, `apiPost`, `apiPut`, `apiPatch`, autenticacao,
+  CSRF, logout e protecao visual com `requireAdmin()`.
 - `dom-utils.js`: sanitizacao de valores antes de insercao em HTML.
 - `formatters.js`: formatacao de datas e textos.
 - `tabela-utils.js`: paginacao e busca reutilizaveis para tabelas.
-- `pages/*`: codigo especifico de cada tela.
+- `assets/js/pages/*`: codigo especifico de cada tela.
 
 ### Backend
 
@@ -419,13 +472,15 @@ Estrutura adotada dentro de `core/`:
 ```text
 core/
 |-- models.py
+|-- permissions.py
 |-- serializers.py
 |-- urls.py
 |-- controllers/
-|   |-- livros.py
-|   |-- usuarios.py
+|   |-- autenticacao.py
+|   |-- dashboard.py
 |   |-- emprestimos.py
-|   `-- dashboard.py
+|   |-- livros.py
+|   `-- usuarios.py
 |-- repositories/
 |   |-- livros.py
 |   |-- usuarios.py
@@ -440,6 +495,9 @@ core/
 Responsabilidades:
 
 - `controllers/*`: recebem requests HTTP e devolvem responses.
+- `controllers/autenticacao.py`: endpoints de login, logout e sessao atual.
+- `permissions.py`: permissao administrativa baseada em `is_staff` ou
+  `is_superuser`.
 - `repositories/*`: concentram consultas ao ORM.
 - `services/emprestimos.py`: regras de criacao, devolucao e estoque.
 - `services/livros.py`: recalculo de disponibilidade.
@@ -486,11 +544,11 @@ cd biblioteca
 python manage.py createsuperuser
 ```
 
-Abrir frontend:
+Abrir frontend pelo Django:
 
 ```text
-Abrir frontend/pages/dashboard.html no navegador ou servir a pasta frontend com
-um servidor local.
+Com o runserver ativo, abrir http://127.0.0.1:8000/ ou
+http://127.0.0.1:8000/login.html no navegador.
 ```
 
 ## Observacao final

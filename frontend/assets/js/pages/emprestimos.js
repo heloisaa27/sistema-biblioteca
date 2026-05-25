@@ -1,6 +1,12 @@
 let controleTabelaEmprestimos = null;
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", iniciarPaginaEmprestimos);
+
+async function iniciarPaginaEmprestimos() {
+    const usuario = await window.bibliotecaApi.requireAdmin();
+
+    if (!usuario) return;
+
     controleTabelaEmprestimos = criarControleTabela({
         tbodyId: "listaEmprestimos",
         inputBuscaId: "buscarEmprestimo",
@@ -12,14 +18,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     carregarEmprestimos();
-});
+}
 
 async function carregarEmprestimos() {
 
 
     try {
 
-        const emprestimos = await apiGet("/emprestimos/");
+        const emprestimos = await window.bibliotecaApi.apiGet("/emprestimos/");
 
         const tbody = document.getElementById("listaEmprestimos");
         tbody.innerHTML = "";
@@ -117,7 +123,7 @@ async function confirmarDevolucao(idEmprestimo) {
 
     if (!confirm("Confirmar devolução deste livro?")) return;
 
-    await apiPatch(`/emprestimos/${idEmprestimo}/`, { status: "devolvido" });
+    await window.bibliotecaApi.apiPatch(`/emprestimos/${idEmprestimo}/`, { status: "devolvido" });
 
     carregarEmprestimos();
 }

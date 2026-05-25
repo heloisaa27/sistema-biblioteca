@@ -1,6 +1,12 @@
 let controleTabelaLivros = null;
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", iniciarPaginaLivros);
+
+async function iniciarPaginaLivros() {
+    const usuario = await window.bibliotecaApi.requireAdmin();
+
+    if (!usuario) return;
+
     controleTabelaLivros = criarControleTabela({
         tbodyId: "listaLivros",
         inputBuscaId: "buscarLivro",
@@ -12,13 +18,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     carregarLivros();
-});
+}
 
 async function carregarLivros() {
 
     try {
 
-        const livros = await apiGet("/livros/");
+        const livros = await window.bibliotecaApi.apiGet("/livros/");
 
         const tbody = document.getElementById("listaLivros");
 
@@ -119,7 +125,7 @@ window.alternarLivro = async function (id, ativo) {
 
     try {
 
-        await apiPatch(`/livros/${id}/`, { ativo: ativo });
+        await window.bibliotecaApi.apiPatch(`/livros/${id}/`, { ativo: ativo });
 
         carregarLivros();
 

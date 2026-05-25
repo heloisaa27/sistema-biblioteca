@@ -1,66 +1,69 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
-  <title>Novo Empréstimo</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <title>Novo Emprestimo</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=login-redesign-2">
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
 </head>
+
 <body>
 
-<div class="layout">
+  <div class="layout">
 
-  <aside class="sidebar">
-    <h2>Sistema Biblioteca</h2>
-    <span class="version">Versão 1.0</span>
-    <nav>
-      <a href="dashboard.html">Dashboard</a>
-      <a class="active" href="emprestimos.html">Empréstimos</a>
-      <a href="livros.html">Livros</a>
-      <a href="usuarios.html">Usuários</a>
-    </nav>
-  </aside>
+    <aside class="sidebar">
+      <h2>Sistema Biblioteca</h2>
+      <span class="version">Versao 1.0</span>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a class="active" href="emprestimos.html">Emprestimos</a>
+        <a href="livros.html">Livros</a>
+        <a href="usuarios.html">Usuarios</a>
+      </nav>
+    </aside>
 
-  <main class="main">
+    <main class="main">
 
-    <h1>Novo Empréstimo</h1>
+      <h1>Novo Emprestimo</h1>
 
-    <div class="panel">
-      <form id="formEmprestimo">
+      <div class="panel">
+        <form id="formEmprestimo">
 
-        <label>Livro</label>
-        <select id="livro" required>
-          <option value="">Selecione um livro</option>
-        </select>
+          <label>Livro</label>
+          <select id="livro" required>
+            <option value="">Selecione um livro</option>
+          </select>
 
-        <label>Usuário</label>
-        <select id="usuario" required>
-          <option value="">Selecione um usuário</option>
-        </select>
+          <label>Usuario</label>
+          <select id="usuario" required>
+            <option value="">Selecione um usuario</option>
+          </select>
 
-        <label>Data do Empréstimo</label>
-        <input type="date" id="dataEmprestimo" required>
+          <label>Data do Emprestimo</label>
+          <input type="date" id="dataEmprestimo" required>
 
-        <label>Data de Devolução</label>
-        <input type="date" id="dataDevolucao" required>
+          <label>Data de Devolucao</label>
+          <input type="date" id="dataDevolucao" required>
 
-        <br><br>
-        <button class="btn">Salvar</button>
-        <button type="button" class="btn-cancelar" onclick="window.location.href='emprestimos.html'">
-        Cancelar</button>
-      </form>
-    </div>
+          <br><br>
+          <button class="btn">Salvar</button>
+          <button type="button" class="btn-cancelar" onclick="window.location.href='emprestimos.html'">
+            Cancelar</button>
+        </form>
+      </div>
 
-  </main>
+    </main>
 
-</div>
+  </div>
 
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-<script src="{% static 'js/shared/config.js' %}"></script>
-<script src="{% static 'js/shared/api.js' %}"></script>
-<script src="{% static 'js/pages/emprestimo-form.js' %}"></script>
+  <script src="{% static 'js/shared/config.js' %}?v=login-redesign-2"></script>
+  <script src="{% static 'js/shared/api.js' %}?v=login-redesign-2"></script>
+  <script src="{% static 'js/pages/emprestimo-form.js' %}?v=login-redesign-2"></script>
 </body>
+
 </html>

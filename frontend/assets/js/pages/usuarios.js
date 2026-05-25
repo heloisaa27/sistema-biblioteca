@@ -1,6 +1,12 @@
 let controleTabelaUsuarios = null;
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", iniciarPaginaUsuarios);
+
+async function iniciarPaginaUsuarios() {
+    const usuario = await window.bibliotecaApi.requireAdmin();
+
+    if (!usuario) return;
+
     controleTabelaUsuarios = criarControleTabela({
         tbodyId: "listaUsuarios",
         inputBuscaId: "buscarUsuario",
@@ -12,13 +18,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     carregarUsuarios();
-});
+}
 
 async function carregarUsuarios() {
 
     try {
 
-        const usuarios = await apiGet("/usuarios/");
+        const usuarios = await window.bibliotecaApi.apiGet("/usuarios/");
 
         const tbody = document.getElementById("listaUsuarios");
 
@@ -112,7 +118,7 @@ window.alternarUsuario = async function (id, ativo) {
 
     try {
 
-        await apiPatch(`/usuarios/${id}/`, { ativo: ativo });
+        await window.bibliotecaApi.apiPatch(`/usuarios/${id}/`, { ativo: ativo });
 
         carregarUsuarios();
 

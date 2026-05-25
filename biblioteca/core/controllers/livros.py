@@ -1,12 +1,14 @@
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from core.permissions import IsAdminOrSuperuser
 from core.repositories.livros import listar_livros
 from core.serializers import LivroSerializer
 from core.services.livros import recalcular_disponiveis
 
 
 class LivroViewSet(ModelViewSet):
+    permission_classes = [IsAdminOrSuperuser]
     serializer_class = LivroSerializer
 
     def get_queryset(self):

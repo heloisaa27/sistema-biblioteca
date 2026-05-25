@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Biblioteca | Login</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=login-redesign-2">
+</head>
+
+<body class="login-page">
+  <main class="login-card" aria-labelledby="loginTitle">
+    <div class="login-badge">Acesso administrativo</div>
+
+    <header class="login-header">
+      <h1 id="loginTitle">Sistema Biblioteca</h1>
+      <p>Entre com sua conta de administrador para continuar.</p>
+    </header>
+
+    <form id="loginForm" class="login-form">
+      <div class="login-field">
+        <label for="username">Usuario</label>
+        <input type="text" id="username" autocomplete="username" required>
+      </div>
+
+      <div class="login-field">
+        <label for="password">Senha</label>
+        <input type="password" id="password" autocomplete="current-password" required>
+      </div>
+
+      <p id="loginError" class="login-error" aria-live="polite" hidden></p>
+
+      <button class="btn login-submit" type="submit">Entrar</button>
+    </form>
+  </main>
+
+  <script src="{% static 'js/shared/config.js' %}?v=login-redesign-2"></script>
+  <script src="{% static 'js/shared/api.js' %}?v=login-redesign-2"></script>
+  <script src="{% static 'js/pages/login.js' %}?v=login-redesign-2"></script>
+</body>
+
+</html>

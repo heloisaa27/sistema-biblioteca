@@ -1,11 +1,113 @@
 from datetime import date, timedelta
 
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
 from .models import Emprestimo, Livro, Usuario
 from .services.usuarios import remover_usuarios_desativados_expirados
+
+
+def autenticar_admin(client, username="admin"):
+    admin = User.objects.create_user(
+        username=username,
+        password="senha-admin",
+        is_staff=True,
+    )
+    client.force_login(admin)
+
+    return admin
+
+
+class AuthAdminTests(TestCase):
+    def test_login_com_admin_valido(self):
+        User.objects.create_user(
+            username="bibliotecario",
+            password="senha-correta",
+            is_staff=True,
+        )
+
+        response = self.client.post(
+            "/api/auth/login/",
+            data={
+                "username": "bibliotecario",
+                "password": "senha-correta",
+            },
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["authenticated"])
+        self.assertTrue(response.json()["is_admin"])
+        self.assertEqual(response.json()["username"], "bibliotecario")
+
+    def test_login_com_senha_invalida(self):
+        User.objects.create_user(
+            username="bibliotecario",
+            password="senha-correta",
+            is_staff=True,
+        )
+
+        response = self.client.post(
+            "/api/auth/login/",
+            data={
+                "username": "bibliotecario",
+                "password": "senha-errada",
+            },
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 401)
+        self.assertIn("Usuario ou senha invalidos", response.json()["error"])
+
+    def test_login_com_usuario_comum_sem_staff(self):
+        User.objects.create_user(
+            username="usuario",
+            password="senha-correta",
+            is_staff=False,
+        )
+
+        response = self.client.post(
+            "/api/auth/login/",
+            data={
+                "username": "usuario",
+                "password": "senha-correta",
+            },
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertIn("permissao administrativa", response.json()["error"])
+
+    def test_me_autenticado(self):
+        autenticar_admin(self.client, username="admin-me")
+
+        response = self.client.get("/api/auth/me/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["authenticated"])
+        self.assertTrue(response.json()["is_admin"])
+        self.assertEqual(response.json()["username"], "admin-me")
+
+    def test_me_anonimo(self):
+        response = self.client.get("/api/auth/me/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()["authenticated"])
+        self.assertFalse(response.json()["is_admin"])
+
+    def test_logout(self):
+        autenticar_admin(self.client)
+
+        response = self.client.post("/api/auth/logout/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()["authenticated"])
+
+        me_response = self.client.get("/api/auth/me/")
+
+        self.assertFalse(me_response.json()["authenticated"])
 
 
 class EmprestimoEstoqueTests(TestCase):
@@ -70,6 +172,8 @@ class EmprestimoEstoqueTests(TestCase):
 
 class DashboardTests(TestCase):
     def setUp(self):
+        autenticar_admin(self.client)
+
         self.livro = Livro.objects.create(
             titulo="Livro Dashboard",
             autor="Autor Dashboard",
@@ -129,6 +233,9 @@ class DashboardTests(TestCase):
 
 
 class ApiIntegrationTests(TestCase):
+    def setUp(self):
+        autenticar_admin(self.client)
+
     def test_fluxo_completo_de_livro_usuario_emprestimo_e_devolucao(self):
         livro_response = self.client.post(
             "/api/livros/",
@@ -195,6 +302,8 @@ class ApiIntegrationTests(TestCase):
 
 class UsuarioLifecycleTests(TestCase):
     def setUp(self):
+        autenticar_admin(self.client)
+
         self.livro = Livro.objects.create(
             titulo="Livro Usuario",
             autor="Autor Usuario",
@@ -276,6 +385,8 @@ class UsuarioLifecycleTests(TestCase):
 
 class DashboardPeriodoTests(TestCase):
     def test_dashboard_trimestre_limita_emprestimos_por_data(self):
+        autenticar_admin(self.client)
+
         usuario = Usuario.objects.create(
             nome="Usuario Periodo",
             email="periodo@example.com",

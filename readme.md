@@ -47,6 +47,8 @@ http://127.0.0.1:8000/
 Importante: nao abra os arquivos da pasta `templates` diretamente no navegador.
 Eles sao templates Django e precisam ser servidos pelo `runserver` para carregar
 CSS, JavaScript e dados da API corretamente.
+Os HTMLs oficiais ficam em `templates/`; a pasta `frontend/` guarda apenas os
+assets estaticos usados por esses templates.
 
 ## Funcionalidades
 
@@ -75,6 +77,18 @@ CSS, JavaScript e dados da API corretamente.
 /api/usuarios/
 /api/emprestimos/
 /api/dashboard/
+```
+
+## Sessao Administrativa
+
+O refresh da pagina mantem o usuario logado enquanto a sessao Django estiver
+valida. O botao Sair encerra a sessao imediatamente.
+
+Variaveis disponiveis no `.env.example`:
+
+```text
+SESSION_COOKIE_AGE=7200
+SESSION_EXPIRE_AT_BROWSER_CLOSE=True
 ```
 
 ## Estrutura

@@ -3,6 +3,9 @@ let emprestimoId = null;
 document.addEventListener("DOMContentLoaded", iniciarPagina);
 
 async function iniciarPagina() {
+    const usuario = await window.bibliotecaApi.requireAdmin();
+
+    if (!usuario) return;
 
     const params = new URLSearchParams(window.location.search);
     const modo = params.get("modo");
@@ -41,7 +44,7 @@ async function iniciarPagina() {
 
 async function carregarLivros() {
 
-    const livros = await apiGet("/livros/");
+    const livros = await window.bibliotecaApi.apiGet("/livros/");
 
     const select = document.getElementById("livro");
     select.innerHTML = '<option value="">Selecione um livro</option>';
@@ -63,7 +66,7 @@ async function carregarLivros() {
 
 async function carregarUsuarios() {
 
-    const usuarios = await apiGet("/usuarios/");
+    const usuarios = await window.bibliotecaApi.apiGet("/usuarios/");
 
     const select = document.getElementById("usuario");
     select.innerHTML = '<option value="">Selecione um usuário</option>';
@@ -92,7 +95,7 @@ async function carregarEmprestimo() {
 
         if (!emprestimoId) return;
 
-        const emp = await apiGet(`/emprestimos/${emprestimoId}/`);
+        const emp = await window.bibliotecaApi.apiGet(`/emprestimos/${emprestimoId}/`);
 
         $("#livro").val(emp.livro).trigger("change");
         $("#usuario").val(emp.usuario).trigger("change");
@@ -154,9 +157,9 @@ async function salvarEmprestimo(e) {
     try {
 
         if (metodo === "PATCH") {
-            await apiPatch(url, dados);
+            await window.bibliotecaApi.apiPatch(url, dados);
         } else {
-            await apiPost(url, dados);
+            await window.bibliotecaApi.apiPost(url, dados);
         }
 
         window.location.href = "emprestimos.html";

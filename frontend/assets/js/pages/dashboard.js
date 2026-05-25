@@ -3,7 +3,10 @@ let graficoLinha = null;
 let graficoBarra = null;
 let graficoStatus = null;
 
-function iniciarDashboard() {
+async function iniciarDashboard() {
+    const usuario = await window.bibliotecaApi.requireAdmin();
+
+    if (!usuario) return;
 
     carregarDashboard("mes")
 
@@ -27,7 +30,7 @@ async function carregarDashboard(periodo = "mes") {
     }
 
     try {
-        const dados = await apiGet(url);
+        const dados = await window.bibliotecaApi.apiGet(url);
 
 
         atualizarCards(dados.cards);
