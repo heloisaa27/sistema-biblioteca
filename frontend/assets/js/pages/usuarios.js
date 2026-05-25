@@ -116,15 +116,30 @@ async function carregarUsuarios() {
 window.alternarUsuario = async function (id, ativo) {
     console.log("Alternando usuário:", id, ativo);
 
+    const confirmado = await window.bibliotecaApi.confirmarAcao({
+        titulo: ativo ? "Reativar usuario" : "Desativar usuario",
+        mensagem: ativo
+            ? "Este usuario voltara a aparecer como opcao para novos emprestimos."
+            : "Este usuario deixara de aparecer como opcao para novos emprestimos. Se houver emprestimo atrasado ativo, a API bloqueara a desativacao.",
+        textoConfirmar: ativo ? "Reativar" : "Desativar",
+        tipo: ativo ? "primary" : "danger",
+    });
+
+    if (!confirmado) return;
+
     try {
 
         await window.bibliotecaApi.apiPatch(`/usuarios/${id}/`, { ativo: ativo });
 
-        carregarUsuarios();
+        await carregarUsuarios();
+        window.bibliotecaApi.mostrarToast(
+            ativo ? "Usuario reativado com sucesso." : "Usuario desativado com sucesso.",
+            "success"
+        );
 
     } catch (erro) {
         console.error("Erro ao alternar usuário:", erro);
-        alert(erro.message);
+        window.bibliotecaApi.mostrarToast(erro.message || "Erro ao atualizar usuario.", "error");
     }
 
 };

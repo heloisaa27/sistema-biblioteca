@@ -127,13 +127,13 @@ async function salvarEmprestimo(e) {
     const dataDevolucao = document.getElementById("dataDevolucao").value;
 
     if (!livroId) {
-        alert("Selecione um livro.");
+        window.bibliotecaApi.mostrarToast("Selecione um livro.", "warning");
         return;
     }
 
 
     if (!usuarioId) {
-        alert("Selecione um usuário.");
+        window.bibliotecaApi.mostrarToast("Selecione um usuario.", "warning");
         return;
     }
 
@@ -158,8 +158,10 @@ async function salvarEmprestimo(e) {
 
         if (metodo === "PATCH") {
             await window.bibliotecaApi.apiPatch(url, dados);
+            window.bibliotecaApi.registrarToastPendente("Emprestimo atualizado com sucesso.", "success");
         } else {
             await window.bibliotecaApi.apiPost(url, dados);
+            window.bibliotecaApi.registrarToastPendente("Emprestimo criado com sucesso.", "success");
         }
 
         window.location.href = "emprestimos.html";
@@ -167,6 +169,7 @@ async function salvarEmprestimo(e) {
     } catch (erro) {
 
         console.error("Erro:", erro);
+        window.bibliotecaApi.mostrarToast(erro.message || "Erro ao salvar emprestimo.", "error");
 
     }
 

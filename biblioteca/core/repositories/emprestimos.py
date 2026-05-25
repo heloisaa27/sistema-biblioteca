@@ -35,6 +35,21 @@ def contar_emprestimos_atrasados(hoje):
     ).count()
 
 
+def contar_emprestimos_vencendo_hoje(hoje):
+    return Emprestimo.objects.filter(
+        status="emprestado",
+        data_devolucao=hoje,
+    ).count()
+
+
+def contar_emprestimos_vencendo_em_breve(hoje, dias=3):
+    return Emprestimo.objects.filter(
+        status="emprestado",
+        data_devolucao__gt=hoje,
+        data_devolucao__lte=hoje + timedelta(days=dias),
+    ).count()
+
+
 def contar_total_livros():
     return Livro.objects.count()
 
@@ -43,6 +58,14 @@ def contar_livros_disponiveis():
     return Livro.objects.filter(
         ativo=True,
         disponiveis__gt=0,
+    ).count()
+
+
+def contar_livros_baixa_disponibilidade(limite_disponiveis=1):
+    return Livro.objects.filter(
+        ativo=True,
+        total__gt=0,
+        disponiveis__lte=limite_disponiveis,
     ).count()
 
 
@@ -93,4 +116,29 @@ def listar_atrasados_recentes(hoje, limite=10):
         )
         .select_related("livro", "usuario")
         .order_by("data_devolucao")[:limite]
+    )
+
+
+def listar_vencimentos_proximos(hoje, dias=3, limite=10):
+    return (
+        Emprestimo.objects
+        .filter(
+            status="emprestado",
+            data_devolucao__gte=hoje,
+            data_devolucao__lte=hoje + timedelta(days=dias),
+        )
+        .select_related("livro", "usuario")
+        .order_by("data_devolucao", "id")[:limite]
+    )
+
+
+def listar_livros_baixa_disponibilidade(limite_disponiveis=1, limite=8):
+    return (
+        Livro.objects
+        .filter(
+            ativo=True,
+            total__gt=0,
+            disponiveis__lte=limite_disponiveis,
+        )
+        .order_by("disponiveis", "titulo")[:limite]
     )

@@ -38,11 +38,18 @@ async function salvarLivro(e) {
         disponiveis: Number(total),
     };
 
-    if (livroId) {
-        await window.bibliotecaApi.apiPut(`/livros/${livroId}/`, dados);
-    } else {
-        await window.bibliotecaApi.apiPost("/livros/", dados);
-    }
+    try {
+        if (livroId) {
+            await window.bibliotecaApi.apiPut(`/livros/${livroId}/`, dados);
+            window.bibliotecaApi.registrarToastPendente("Livro atualizado com sucesso.", "success");
+        } else {
+            await window.bibliotecaApi.apiPost("/livros/", dados);
+            window.bibliotecaApi.registrarToastPendente("Livro cadastrado com sucesso.", "success");
+        }
 
-    window.location.href = "livros.html";
+        window.location.href = "livros.html";
+    } catch (erro) {
+        console.error("Erro ao salvar livro:", erro);
+        window.bibliotecaApi.mostrarToast(erro.message || "Erro ao salvar livro.", "error");
+    }
 }

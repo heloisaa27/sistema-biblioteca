@@ -123,14 +123,30 @@ async function carregarLivros() {
 window.alternarLivro = async function (id, ativo) {
     console.log("Alternando livro:", id, ativo);
 
+    const confirmado = await window.bibliotecaApi.confirmarAcao({
+        titulo: ativo ? "Reativar livro" : "Desativar livro",
+        mensagem: ativo
+            ? "Este livro voltara a aparecer como opcao para novos emprestimos."
+            : "Este livro deixara de aparecer como opcao para novos emprestimos, mas o historico sera mantido.",
+        textoConfirmar: ativo ? "Reativar" : "Desativar",
+        tipo: ativo ? "primary" : "danger",
+    });
+
+    if (!confirmado) return;
+
     try {
 
         await window.bibliotecaApi.apiPatch(`/livros/${id}/`, { ativo: ativo });
 
-        carregarLivros();
+        await carregarLivros();
+        window.bibliotecaApi.mostrarToast(
+            ativo ? "Livro reativado com sucesso." : "Livro desativado com sucesso.",
+            "success"
+        );
 
     } catch (erro) {
         console.error("Erro ao alternar livro:", erro);
+        window.bibliotecaApi.mostrarToast(erro.message || "Erro ao atualizar livro.", "error");
     }
 
 };

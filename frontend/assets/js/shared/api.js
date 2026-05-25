@@ -104,6 +104,107 @@
         }
     }
 
+    function normalizarTipoConfirmacao(tipo) {
+        return ["danger", "primary", "success"].includes(tipo) ? tipo : "primary";
+    }
+
+    function confirmarAcao(opcoes = {}) {
+        if (typeof document === "undefined") {
+            return Promise.resolve(false);
+        }
+
+        const titulo = opcoes.titulo || "Confirmar acao";
+        const mensagem = opcoes.mensagem || "Deseja continuar?";
+        const textoCancelar = opcoes.textoCancelar || "Cancelar";
+        const textoConfirmar = opcoes.textoConfirmar || "Confirmar";
+        const tipo = normalizarTipoConfirmacao(opcoes.tipo);
+        const tituloId = `confirm-title-${Date.now()}`;
+        const focoAnterior = document.activeElement;
+
+        return new Promise((resolve) => {
+            const overlay = document.createElement("div");
+            overlay.className = "confirm-overlay";
+
+            const modal = document.createElement("div");
+            modal.className = "confirm-modal";
+            modal.setAttribute("role", "dialog");
+            modal.setAttribute("aria-modal", "true");
+            modal.setAttribute("aria-labelledby", tituloId);
+
+            const tituloEl = document.createElement("h2");
+            tituloEl.id = tituloId;
+            tituloEl.textContent = titulo;
+
+            const mensagemEl = document.createElement("p");
+            mensagemEl.textContent = mensagem;
+
+            const acoes = document.createElement("div");
+            acoes.className = "confirm-actions";
+
+            const botaoCancelar = document.createElement("button");
+            botaoCancelar.type = "button";
+            botaoCancelar.className = "confirm-btn confirm-btn-cancel";
+            botaoCancelar.textContent = textoCancelar;
+
+            const botaoConfirmar = document.createElement("button");
+            botaoConfirmar.type = "button";
+            botaoConfirmar.className = `confirm-btn confirm-btn-confirm confirm-btn-${tipo}`;
+            botaoConfirmar.textContent = textoConfirmar;
+
+            acoes.append(botaoCancelar, botaoConfirmar);
+            modal.append(tituloEl, mensagemEl, acoes);
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            let resolvido = false;
+
+            function fechar(confirmado) {
+                if (resolvido) return;
+
+                resolvido = true;
+                document.removeEventListener("keydown", tratarTecla);
+                overlay.classList.remove("confirm-overlay-visible");
+
+                window.setTimeout(() => {
+                    overlay.remove();
+
+                    if (focoAnterior && typeof focoAnterior.focus === "function") {
+                        focoAnterior.focus();
+                    }
+                }, 180);
+
+                resolve(confirmado);
+            }
+
+            function tratarTecla(event) {
+                if (event.key === "Escape") {
+                    fechar(false);
+                }
+            }
+
+            overlay.addEventListener("click", (event) => {
+                if (event.target === overlay) {
+                    fechar(false);
+                }
+            });
+
+            botaoCancelar.addEventListener("click", () => fechar(false));
+            botaoConfirmar.addEventListener("click", () => fechar(true));
+            document.addEventListener("keydown", tratarTecla);
+
+            const mostrarModal = () => {
+                overlay.classList.add("confirm-overlay-visible");
+                botaoConfirmar.focus();
+            };
+
+            if (window.requestAnimationFrame) {
+                window.requestAnimationFrame(mostrarModal);
+            } else {
+                window.setTimeout(mostrarModal, 0);
+            }
+        });
+    }
+
     async function carregarCsrfToken() {
         if (csrfToken) return csrfToken;
 
@@ -324,5 +425,6 @@
         obterProximaPaginaPadrao,
         mostrarToast,
         registrarToastPendente,
+        confirmarAcao,
     };
 })();

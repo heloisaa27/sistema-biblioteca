@@ -209,6 +209,8 @@ class DashboardTests(TestCase):
         self.assertIn("emprestimos_por_data", dados)
         self.assertIn("livros_populares", dados)
         self.assertIn("status_distribution", dados)
+        self.assertIn("vencimentos_proximos", dados)
+        self.assertIn("livros_baixa_disponibilidade", dados)
         self.assertIn("atrasados_recentes", dados)
         self.assertEqual(dados["cards"]["emprestimos_ativos"], 1)
 
@@ -230,6 +232,114 @@ class DashboardTests(TestCase):
         self.assertEqual(dados["cards"]["emprestimos_atrasados"], 1)
         self.assertEqual(len(dados["atrasados_recentes"]), 1)
         self.assertEqual(dados["atrasados_recentes"][0]["dias_atraso"], 3)
+
+    def test_dashboard_lista_emprestimo_vencendo_hoje(self):
+        emprestimo = Emprestimo.objects.create(
+            livro=self.livro,
+            usuario=self.usuario,
+            data_emprestimo=date.today() - timedelta(days=2),
+            data_devolucao=date.today(),
+            status="emprestado",
+        )
+
+        response = self.client.get("/api/dashboard/")
+
+        self.assertEqual(response.status_code, 200)
+
+        dados = response.json()
+
+        self.assertEqual(dados["cards"]["emprestimos_vencendo_hoje"], 1)
+        self.assertEqual(len(dados["vencimentos_proximos"]), 1)
+        vencimento = dados["vencimentos_proximos"][0]
+
+        self.assertEqual(vencimento["id"], emprestimo.id)
+        self.assertEqual(vencimento["usuario_nome"], self.usuario.nome)
+        self.assertEqual(vencimento["livro"], self.livro.titulo)
+        self.assertEqual(vencimento["data_emprestimo"], str(date.today() - timedelta(days=2)))
+        self.assertEqual(vencimento["data_devolucao"], str(date.today()))
+        self.assertEqual(vencimento["status"], "hoje")
+        self.assertEqual(vencimento["situacao"], "Vence hoje")
+        self.assertEqual(vencimento["dias_para_vencer"], 0)
+
+    def test_dashboard_lista_emprestimo_vencendo_amanha(self):
+        Emprestimo.objects.create(
+            livro=self.livro,
+            usuario=self.usuario,
+            data_emprestimo=date.today(),
+            data_devolucao=date.today() + timedelta(days=1),
+            status="emprestado",
+        )
+
+        response = self.client.get("/api/dashboard/")
+
+        self.assertEqual(response.status_code, 200)
+
+        dados = response.json()
+
+        self.assertEqual(dados["cards"]["emprestimos_vencendo_3_dias"], 1)
+        self.assertEqual(len(dados["vencimentos_proximos"]), 1)
+        self.assertEqual(dados["vencimentos_proximos"][0]["status"], "em_breve")
+        self.assertEqual(dados["vencimentos_proximos"][0]["situacao"], "Vence amanhã")
+        self.assertEqual(dados["vencimentos_proximos"][0]["dias_para_vencer"], 1)
+
+    def test_dashboard_lista_emprestimo_vencendo_nos_proximos_3_dias(self):
+        Emprestimo.objects.create(
+            livro=self.livro,
+            usuario=self.usuario,
+            data_emprestimo=date.today(),
+            data_devolucao=date.today() + timedelta(days=3),
+            status="emprestado",
+        )
+
+        response = self.client.get("/api/dashboard/")
+
+        self.assertEqual(response.status_code, 200)
+
+        dados = response.json()
+
+        self.assertEqual(dados["cards"]["emprestimos_vencendo_3_dias"], 1)
+        self.assertEqual(len(dados["vencimentos_proximos"]), 1)
+        self.assertEqual(dados["vencimentos_proximos"][0]["status"], "em_breve")
+        self.assertEqual(dados["vencimentos_proximos"][0]["situacao"], "Vence em 3 dias")
+        self.assertEqual(dados["vencimentos_proximos"][0]["dias_para_vencer"], 3)
+
+    def test_dashboard_nao_lista_emprestimo_devolvido_nos_vencimentos(self):
+        Emprestimo.objects.create(
+            livro=self.livro,
+            usuario=self.usuario,
+            data_emprestimo=date.today(),
+            data_devolucao=date.today() + timedelta(days=1),
+            status="devolvido",
+        )
+
+        response = self.client.get("/api/dashboard/")
+
+        self.assertEqual(response.status_code, 200)
+
+        dados = response.json()
+
+        self.assertEqual(dados["cards"]["emprestimos_vencendo_3_dias"], 0)
+        self.assertEqual(dados["vencimentos_proximos"], [])
+
+    def test_dashboard_nao_lista_emprestimo_atrasado_nos_vencimentos(self):
+        Emprestimo.objects.create(
+            livro=self.livro,
+            usuario=self.usuario,
+            data_emprestimo=date.today() - timedelta(days=5),
+            data_devolucao=date.today() - timedelta(days=1),
+            status="emprestado",
+        )
+
+        response = self.client.get("/api/dashboard/")
+
+        self.assertEqual(response.status_code, 200)
+
+        dados = response.json()
+
+        self.assertEqual(dados["cards"]["emprestimos_atrasados"], 1)
+        self.assertEqual(dados["cards"]["emprestimos_vencendo_hoje"], 0)
+        self.assertEqual(dados["cards"]["emprestimos_vencendo_3_dias"], 0)
+        self.assertEqual(dados["vencimentos_proximos"], [])
 
 
 class ApiIntegrationTests(TestCase):

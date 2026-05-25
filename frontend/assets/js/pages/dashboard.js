@@ -41,6 +41,10 @@ async function carregarDashboard(periodo = "mes") {
 
         criarGraficoStatus(dados.status_distribution);
 
+        preencherTabelaVencimentos(dados.vencimentos_proximos);
+
+        preencherTabelaBaixaDisponibilidade(dados.livros_baixa_disponibilidade);
+
         preencherTabelaAtrasados(dados.atrasados_recentes);
 
     } catch (erro) {
@@ -63,6 +67,15 @@ function atualizarCards(cards) {
 
     document.querySelector("#cardAtrasados").textContent =
         cards.emprestimos_atrasados;
+
+    document.querySelector("#cardVencendoHoje").textContent =
+        cards.emprestimos_vencendo_hoje || 0;
+
+    document.querySelector("#cardVencendoProximos").textContent =
+        cards.emprestimos_vencendo_3_dias || 0;
+
+    document.querySelector("#cardBaixaDisponibilidade").textContent =
+        cards.livros_baixa_disponibilidade || 0;
 
     document.querySelector("#cardTotalLivros").textContent =
         cards.total_livros;
@@ -276,6 +289,117 @@ function criarGraficoStatus(dados) {
             }
 
         }
+
+    });
+
+}
+
+
+// =========================
+// TABELA VENCIMENTOS
+// =========================
+
+function obterStatusVencimento(emp) {
+    if (emp.status === "hoje") {
+        return {
+            classe: "vence-hoje",
+            texto: emp.situacao || "Vence hoje",
+        };
+    }
+
+    return {
+        classe: "em-breve",
+        texto: emp.situacao || `Vence em ${emp.dias_para_vencer} dia${emp.dias_para_vencer === 1 ? "" : "s"}`,
+    };
+}
+
+function preencherTabelaVencimentos(vencimentos) {
+
+    const tbody = document.getElementById("tabelaVencimentos");
+
+    tbody.innerHTML = "";
+
+    if (!vencimentos || vencimentos.length === 0) {
+
+        tbody.innerHTML = `
+        <tr>
+        <td colspan="4" style="text-align:center;">
+        Nenhum empréstimo vencendo nos próximos dias.
+        </td>
+        </tr>
+        `;
+
+        return;
+
+    }
+
+    vencimentos.forEach(emp => {
+        const status = obterStatusVencimento(emp);
+
+        tbody.innerHTML += `
+
+        <tr>
+
+        <td>${escapeHtml(emp.usuario_nome)}</td>
+
+        <td>${escapeHtml(emp.livro)}</td>
+
+        <td>${escapeHtml(formatarData(emp.data_devolucao))}</td>
+
+        <td>
+            <span class="status ${status.classe}">
+                ${escapeHtml(status.texto)}
+            </span>
+        </td>
+
+        </tr>
+
+        `;
+
+    });
+
+}
+
+
+// =========================
+// TABELA BAIXA DISPONIBILIDADE
+// =========================
+
+function preencherTabelaBaixaDisponibilidade(livros) {
+
+    const tbody = document.getElementById("tabelaBaixaDisponibilidade");
+
+    tbody.innerHTML = "";
+
+    if (!livros || livros.length === 0) {
+
+        tbody.innerHTML = `
+        <tr>
+        <td colspan="3" style="text-align:center;">
+        Nenhum livro com baixa disponibilidade
+        </td>
+        </tr>
+        `;
+
+        return;
+
+    }
+
+    livros.forEach(livro => {
+
+        tbody.innerHTML += `
+
+        <tr>
+
+        <td>${escapeHtml(livro.titulo)}</td>
+
+        <td>${escapeHtml(livro.disponiveis)}</td>
+
+        <td>${escapeHtml(livro.total)}</td>
+
+        </tr>
+
+        `;
 
     });
 

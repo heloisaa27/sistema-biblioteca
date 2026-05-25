@@ -68,6 +68,25 @@
 </div>
 </section>
 
+<section class="cards operational-cards">
+
+<div class="card info">
+<h3>Vencendo Hoje</h3>
+<strong id="cardVencendoHoje">0</strong>
+</div>
+
+<div class="card attention">
+<h3>Vencendo em 3 Dias</h3>
+<strong id="cardVencendoProximos">0</strong>
+</div>
+
+<div class="card warning">
+<h3>Baixa Disponibilidade</h3>
+<strong id="cardBaixaDisponibilidade">0</strong>
+</div>
+
+</section>
+
 
 
 <section class="dashboard-charts">
@@ -100,6 +119,51 @@
 <div class="panel">
 <h2>Distribuição de Empréstimos por Status</h2>
 <canvas id="pieChart"></canvas>
+</div>
+
+</section>
+
+<section class="dashboard-operational-grid">
+
+<div class="panel">
+
+<h2>Vencimentos Próximos</h2>
+
+<table class="table">
+
+<thead>
+<tr>
+<th>Usuário</th>
+<th>Livro</th>
+<th>Data Prevista</th>
+<th>Situação</th>
+</tr>
+</thead>
+
+<tbody id="tabelaVencimentos"></tbody>
+
+</table>
+
+</div>
+
+<div class="panel">
+
+<h2>Livros com Baixa Disponibilidade</h2>
+
+<table class="table">
+
+<thead>
+<tr>
+<th>Livro</th>
+<th>Disponíveis</th>
+<th>Total</th>
+</tr>
+</thead>
+
+<tbody id="tabelaBaixaDisponibilidade"></tbody>
+
+</table>
+
 </div>
 
 </section>

@@ -32,11 +32,18 @@ async function salvarUsuario(e) {
         telefone: document.getElementById("telefone").value,
     };
 
-    if (usuarioId) {
-        await window.bibliotecaApi.apiPut(`/usuarios/${usuarioId}/`, dados);
-    } else {
-        await window.bibliotecaApi.apiPost("/usuarios/", dados);
-    }
+    try {
+        if (usuarioId) {
+            await window.bibliotecaApi.apiPut(`/usuarios/${usuarioId}/`, dados);
+            window.bibliotecaApi.registrarToastPendente("Usuario atualizado com sucesso.", "success");
+        } else {
+            await window.bibliotecaApi.apiPost("/usuarios/", dados);
+            window.bibliotecaApi.registrarToastPendente("Usuario cadastrado com sucesso.", "success");
+        }
 
-    window.location.href = "usuarios.html";
+        window.location.href = "usuarios.html";
+    } catch (erro) {
+        console.error("Erro ao salvar usuario:", erro);
+        window.bibliotecaApi.mostrarToast(erro.message || "Erro ao salvar usuario.", "error");
+    }
 }

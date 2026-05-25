@@ -121,11 +121,24 @@ async function carregarEmprestimos() {
 
 async function confirmarDevolucao(idEmprestimo) {
 
-    if (!confirm("Confirmar devolução deste livro?")) return;
+    const confirmado = await window.bibliotecaApi.confirmarAcao({
+        titulo: "Confirmar devolucao",
+        mensagem: "Esta acao marca o emprestimo como devolvido e devolve o exemplar para o acervo disponivel.",
+        textoConfirmar: "Confirmar devolucao",
+        tipo: "success",
+    });
 
-    await window.bibliotecaApi.apiPatch(`/emprestimos/${idEmprestimo}/`, { status: "devolvido" });
+    if (!confirmado) return;
 
-    carregarEmprestimos();
+    try {
+        await window.bibliotecaApi.apiPatch(`/emprestimos/${idEmprestimo}/`, { status: "devolvido" });
+
+        await carregarEmprestimos();
+        window.bibliotecaApi.mostrarToast("Devolucao confirmada com sucesso.", "success");
+    } catch (erro) {
+        console.error("Erro ao confirmar devolucao:", erro);
+        window.bibliotecaApi.mostrarToast(erro.message || "Erro ao confirmar devolucao.", "error");
+    }
 }
 
 function editarEmprestimo(id) {
